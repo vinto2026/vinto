@@ -39,7 +39,7 @@ const handler = async (req, res) => {
   const event = JSON.parse(raw.toString('utf8'));
   if (event.type !== 'checkout.session.completed') return res.status(200).send('ignored');
   const s = event.data.object;
-  if (s.payment_status && s.payment_status !== 'paid') return res.status(200).send('not paid');
+  if (s.payment_status === 'unpaid') return res.status(200).send('not paid');
 
   // Get the items that were bought
   const li = await fetch('https://api.stripe.com/v1/checkout/sessions/' + s.id + '/line_items?limit=100', {
