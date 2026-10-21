@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thank you – VINTO</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#000;color:#f5f5f6;font-family:'Helvetica Neue',Arial,sans-serif}
+main{min-height:100%;display:grid;place-content:center;text-align:center;padding:24px}
+h1{font-family:'Arial Black',Arial,sans-serif;letter-spacing:-.04em;font-size:clamp(2rem,7vw,4rem);margin:0 0 12px}
+p{color:#9c9fa5;max-width:36ch;margin:0 auto 28px;line-height:1.5}
+.promo{margin:0 auto 32px;padding:20px 28px;border:1px dashed rgba(255,255,255,.3);border-radius:18px}
+.promo small{display:block;color:#9c9fa5;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.promo code{display:block;font-family:'Arial Black',Arial,sans-serif;font-size:clamp(1.6rem,6vw,2.2rem);letter-spacing:.08em}
+.promo button{font:inherit;font-weight:700;font-size:.9rem;margin-top:14px;padding:10px 20px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#f5f5f6;cursor:pointer}
+.promo span{display:block;color:#9c9fa5;font-size:.85rem;margin-top:12px}
+a{display:inline-block;padding:16px 30px;border-radius:999px;background:#e6e8eb;color:#0a0a0a;font-weight:800;text-decoration:none}
+</style>
+</head>
+<body><main>
+<h1>Order confirmed.</h1>
+<p>Thanks for pre-ordering. A receipt is on its way to your inbox, and we’ll email you when your order ships.</p>
+<div class="promo">
+<small>10% off your next order</small>
+<code id="code">VINTO26</code>
+<button id="copy" type="button">Copy code</button>
+<span>Enter it in the promo code box at checkout.</span>
+</div>
+<a href="/">Back to VINTO</a>
+</main>
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+var b=this;
+try{navigator.clipboard.writeText('VINTO26').then(function(){b.textContent='Copied'},function(){b.textContent='Select the code to copy'})}
+catch(e){b.textContent='Select the code to copy'}
+});
+</script>
+</body>
+</html>
