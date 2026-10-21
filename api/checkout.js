@@ -1,5 +1,5 @@
-// Vercel Serverless Function: POST /api/checkout  (same logic as functions/api/checkout.js)
-// Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
+// Vercel Serverless Function: POST /api/checkout
+// Needs env var STRIPE_SECRET_KEY.
 const PRODUCTS = {
   jorts:  { name: 'Vinto Jorts',  aud: 80 },
   static: { name: 'Static Hood',  aud: 80 },
@@ -40,6 +40,10 @@ module.exports = async (req, res) => {
     body: p,
   });
   const d = await r.json();
-  if (!r.ok) return res.status(502).json({ error: (d.error && d.error.message) || 'Stripe error' });
+  if (!r.ok) {
+    const k = process.env.STRIPE_SECRET_KEY || '';
+    const hint = ' [key in use: ' + k.slice(0, 3) + '...' + k.slice(-4) + ']';
+    return res.status(502).json({ error: ((d.error && d.error.message) || 'Stripe error') + hint });
+  }
   res.status(200).json({ url: d.url });
 };
