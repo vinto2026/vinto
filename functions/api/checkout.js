@@ -1,49 +1,51 @@
-// Cloudflare Pages Function: POST /api/checkout
-// Builds ONE Stripe Checkout page for the whole cart. Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
+// Vercel Serverless Function: POST /api/checkout  (same logic as functions/api/checkout.js)
+// Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
 const PRODUCTS = {
   jorts:  { name: 'Vinto Jorts',  aud: 80 },
-  static: { name: 'Static Hood',  aud: 80 },
+  static: { name: 'Static Hood',  aud: 80, colors: { grey: 'Grey / Olive', black: 'Black' } },
   sweats: { name: 'Loop Sweats',  aud: 90 },
 };
 const SIZES = ['S', 'M', 'L', 'XL'];
 
-const json = (obj, status = 200) =>
-  new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'STRIPE_SECRET_KEY is not set' });
+  const items = Array.isArray(req.body && req.body.items) ? req.body.items.slice(0, 20) : [];
+  if (!items.length) return res.status(400).json({ error: 'Cart is empty' });
 
-export async function onRequestPost({ request, env }) {
-  if (!env.STRIPE_SECRET_KEY) return json({ error: 'STRIPE_SECRET_KEY is not set' }, 500);
-  let body;
-  try { body = await request.json(); } catch { return json({ error: 'Bad request' }, 400); }
-  const items = Array.isArray(body.items) ? body.items.slice(0, 20) : [];
-  if (!items.length) return json({ error: 'Cart is empty' }, 400);
-
-  const origin = new URL(request.url).origin;
+  const origin = 'https://' + req.headers.host;
   const p = new URLSearchParams();
   p.set('mode', 'payment');
   p.set('success_url', origin + '/success.html');
   p.set('cancel_url', origin + '/#collection');
   p.set('allow_promotion_codes', 'true');
   p.set('shipping_address_collection[allowed_countries][0]', 'AU');
+  p.set('shipping_address_collection[allowed_countries][1]', 'NZ');
   p.set('billing_address_collection', 'auto');
+  p.set('custom_text[submit][message]', 'Pre-order: estimated to ship early December 2026. We will email you when your order ships.');
 
   let n = 0;
   for (const it of items) {
     const prod = PRODUCTS[it.id];
     const qty = Math.min(10, Math.max(1, parseInt(it.qty, 10) || 0));
-    if (!prod || !SIZES.includes(it.size) || !qty) return json({ error: 'Invalid cart item' }, 400);
+    if (!prod || !SIZES.includes(it.size) || !qty || (prod.colors && !prod.colors[it.color])) return res.status(400).json({ error: 'Invalid cart item' });
     p.set(`line_items[${n}][quantity]`, String(qty));
     p.set(`line_items[${n}][price_data][currency]`, 'aud');
     p.set(`line_items[${n}][price_data][unit_amount]`, String(prod.aud * 100));
-    p.set(`line_items[${n}][price_data][product_data][name]`, `${prod.name} (Size ${it.size})`);
+    p.set(`line_items[${n}][price_data][product_data][name]`, prod.colors ? `${prod.name} (${prod.colors[it.color]}, Size ${it.size})` : `${prod.name} (Size ${it.size})`);
     n++;
   }
 
   const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { Authorization: 'Bearer ' + process.env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
     body: p,
   });
   const d = await r.json();
-  if (!r.ok) return json({ error: (d.error && d.error.message) || 'Stripe error' }, 502);
-  return json({ url: d.url });
-}
+  if (!r.ok) {
+    const k = process.env.STRIPE_SECRET_KEY || '';
+    const hint = ' [key in use: ' + k.slice(0, 3) + '...' + k.slice(-4) + ']';
+    return res.status(502).json({ error: ((d.error && d.error.message) || 'Stripe error') + hint });
+  }
+  res.status(200).json({ url: d.url });
+};
