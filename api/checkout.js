@@ -1,8 +1,8 @@
-// Vercel Serverless Function: POST /api/checkout
-// Needs env var STRIPE_SECRET_KEY.
+// Vercel Serverless Function: POST /api/checkout  (same logic as functions/api/checkout.js)
+// Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
 const PRODUCTS = {
   jorts:  { name: 'Vinto Jorts',  aud: 80 },
-  static: { name: 'Static Hood',  aud: 80 },
+  static: { name: 'Static Hood',  aud: 80, colors: { grey: 'Grey / Olive', black: 'Black' } },
   sweats: { name: 'Loop Sweats',  aud: 90 },
 };
 const SIZES = ['S', 'M', 'L', 'XL'];
@@ -20,17 +20,19 @@ module.exports = async (req, res) => {
   p.set('cancel_url', origin + '/#collection');
   p.set('allow_promotion_codes', 'true');
   p.set('shipping_address_collection[allowed_countries][0]', 'AU');
+  p.set('shipping_address_collection[allowed_countries][1]', 'NZ');
   p.set('billing_address_collection', 'auto');
+  p.set('custom_text[submit][message]', 'Pre-order: estimated to ship early December 2026. We will email you when your order ships.');
 
   let n = 0;
   for (const it of items) {
     const prod = PRODUCTS[it.id];
     const qty = Math.min(10, Math.max(1, parseInt(it.qty, 10) || 0));
-    if (!prod || !SIZES.includes(it.size) || !qty) return res.status(400).json({ error: 'Invalid cart item' });
+    if (!prod || !SIZES.includes(it.size) || !qty || (prod.colors && !prod.colors[it.color])) return res.status(400).json({ error: 'Invalid cart item' });
     p.set(`line_items[${n}][quantity]`, String(qty));
     p.set(`line_items[${n}][price_data][currency]`, 'aud');
     p.set(`line_items[${n}][price_data][unit_amount]`, String(prod.aud * 100));
-    p.set(`line_items[${n}][price_data][product_data][name]`, `${prod.name} (Size ${it.size})`);
+    p.set(`line_items[${n}][price_data][product_data][name]`, prod.colors ? `${prod.name} (${prod.colors[it.color]}, Size ${it.size})` : `${prod.name} (Size ${it.size})`);
     n++;
   }
 

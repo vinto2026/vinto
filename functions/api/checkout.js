@@ -1,5 +1,5 @@
-// Vercel Serverless Function: POST /api/checkout  (same logic as functions/api/checkout.js)
-// Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
+// Cloudflare Pages Function: POST /api/checkout
+// Builds ONE Stripe Checkout page for the whole cart. Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
 const PRODUCTS = {
   jorts:  { name: 'Vinto Jorts',  aud: 80 },
   static: { name: 'Static Hood',  aud: 80, colors: { grey: 'Grey / Olive', black: 'Black' } },
@@ -7,13 +7,17 @@ const PRODUCTS = {
 };
 const SIZES = ['S', 'M', 'L', 'XL'];
 
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  if (!process.env.STRIPE_SECRET_KEY) return res.status(500).json({ error: 'STRIPE_SECRET_KEY is not set' });
-  const items = Array.isArray(req.body && req.body.items) ? req.body.items.slice(0, 20) : [];
-  if (!items.length) return res.status(400).json({ error: 'Cart is empty' });
+const json = (obj, status = 200) =>
+  new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } });
 
-  const origin = 'https://' + req.headers.host;
+export async function onRequestPost({ request, env }) {
+  if (!env.STRIPE_SECRET_KEY) return json({ error: 'STRIPE_SECRET_KEY is not set' }, 500);
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Bad request' }, 400); }
+  const items = Array.isArray(body.items) ? body.items.slice(0, 20) : [];
+  if (!items.length) return json({ error: 'Cart is empty' }, 400);
+
+  const origin = new URL(request.url).origin;
   const p = new URLSearchParams();
   p.set('mode', 'payment');
   p.set('success_url', origin + '/success.html');
@@ -28,7 +32,7 @@ module.exports = async (req, res) => {
   for (const it of items) {
     const prod = PRODUCTS[it.id];
     const qty = Math.min(10, Math.max(1, parseInt(it.qty, 10) || 0));
-    if (!prod || !SIZES.includes(it.size) || !qty || (prod.colors && !prod.colors[it.color])) return res.status(400).json({ error: 'Invalid cart item' });
+    if (!prod || !SIZES.includes(it.size) || !qty || (prod.colors && !prod.colors[it.color])) return json({ error: 'Invalid cart item' }, 400);
     p.set(`line_items[${n}][quantity]`, String(qty));
     p.set(`line_items[${n}][price_data][currency]`, 'aud');
     p.set(`line_items[${n}][price_data][unit_amount]`, String(prod.aud * 100));
@@ -38,14 +42,10 @@ module.exports = async (req, res) => {
 
   const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + process.env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: { Authorization: 'Bearer ' + env.STRIPE_SECRET_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
     body: p,
   });
   const d = await r.json();
-  if (!r.ok) {
-    const k = process.env.STRIPE_SECRET_KEY || '';
-    const hint = ' [key in use: ' + k.slice(0, 3) + '...' + k.slice(-4) + ']';
-    return res.status(502).json({ error: ((d.error && d.error.message) || 'Stripe error') + hint });
-  }
-  res.status(200).json({ url: d.url });
-};
+  if (!r.ok) return json({ error: (d.error && d.error.message) || 'Stripe error' }, 502);
+  return json({ url: d.url });
+}

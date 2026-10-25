@@ -234,7 +234,7 @@ html.intro-on body{overflow:hidden}
 </head>
 <body>
 <div id="intro"><button type="button" aria-label="Enter VINTO"><img src="/assets/vinto-logo.webp" alt="Vinto" width="1200" height="432" fetchpriority="high"><span class="tag">VN26</span><span class="hint">Click Vinto to join</span></button></div>
-<script>(function(){var r=document.documentElement,i=document.getElementById('intro'),done=false;r.classList.add('intro-on');function enter(){if(done)return;done=true;i.classList.add('go');r.classList.remove('intro-on');setTimeout(function(){if(i.parentNode)i.remove()},1300)}i.addEventListener('click',enter);i.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')enter()});setTimeout(enter,8000)})();</script>
+<script>document.documentElement.classList.add('intro-on');document.querySelector('#intro button').addEventListener('click',function(){var i=document.getElementById('intro');i.classList.add('go');document.documentElement.classList.remove('intro-on');setTimeout(function(){i.remove()},1300)});</script>
 <header id="nav">
   <a href="#top" class="logo" aria-label="VINTO home">VINTO</a>
   <div class="navr"><nav class="links" aria-label="Main">

@@ -4,6 +4,8 @@
 // Optional: ORDER_EMAIL_FROM (default uses Resend's test sender)
 const crypto = require('crypto');
 
+module.exports.config = { api: { bodyParser: false } };
+
 const readRaw = (req) =>
   new Promise((resolve, reject) => {
     const chunks = [];
@@ -22,6 +24,8 @@ const verify = (raw, header, secret) => {
   const expected = crypto.createHmac('sha256', secret).update(t + '.' + raw.toString('utf8')).digest('hex');
   return sigs.some((s) => s.length === expected.length && crypto.timingSafeEqual(Buffer.from(s), Buffer.from(expected)));
 };
+
+const SHIP_NOTE = 'PRE-ORDER: hold until stock is ready. Estimated shipping early December 2026.';
 
 const esc = (s) =>
   String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -63,6 +67,7 @@ const handler = async (req, res) => {
 
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#111">
 <h2 style="margin:0 0 4px">New VINTO order</h2>
+<p style="margin:0 0 12px;padding:8px 12px;background:#fff3cd;color:#664d03;font-weight:bold">${esc(SHIP_NOTE)}</p>
 <p style="margin:0 0 16px;color:#555">Order ${esc(s.id.slice(-8))}</p>
 <table style="border-collapse:collapse;width:100%;max-width:520px">${rows}
 <tr><td colspan="2" style="padding-top:10px;border-top:1px solid #ddd"><b>Total</b></td><td style="padding-top:10px;border-top:1px solid #ddd;text-align:right"><b>${money(s.amount_total, cur)}</b></td></tr></table>
@@ -74,7 +79,7 @@ ${discount ? `<p style="color:#555">Promo discount applied: ${money(discount, cu
 </div>`;
 
   const text =
-    'New VINTO order ' + s.id.slice(-8) + '\n\n' +
+    SHIP_NOTE + '\n\nNew VINTO order ' + s.id.slice(-8) + '\n\n' +
     items.map((i) => i.quantity + ' x ' + i.description + ' (' + money(i.amount_total, cur) + ')').join('\n') +
     '\n\nTotal: ' + money(s.amount_total, cur) +
     '\n\nShip to:\n' + [name].concat(addr).join('\n') +
@@ -87,7 +92,7 @@ ${discount ? `<p style="color:#555">Promo discount applied: ${money(discount, cu
       from: process.env.ORDER_EMAIL_FROM || 'VINTO Orders <onboarding@resend.dev>',
       to: ORDER_EMAIL_TO.split(',').map((x) => x.trim()).filter(Boolean),
       reply_to: cd.email || undefined,
-      subject: 'New VINTO order: ' + items.map((i) => i.quantity + ' x ' + i.description).join(', ').slice(0, 150),
+      subject: 'PRE-ORDER: New VINTO order: ' + items.map((i) => i.quantity + ' x ' + i.description).join(', ').slice(0, 150),
       html,
       text,
     }),
@@ -97,5 +102,4 @@ ${discount ? `<p style="color:#555">Promo discount applied: ${money(discount, cu
 };
 
 module.exports = handler;
-// Stripe needs the raw request body to check the signature, so Vercel's body parsing is turned off:
 module.exports.config = { api: { bodyParser: false } };
