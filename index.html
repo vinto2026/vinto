@@ -231,7 +231,7 @@ footer{padding:0 var(--pad) 28px;overflow:hidden}
 html.intro-on body{overflow:hidden}
 @media(prefers-reduced-motion:reduce){#intro button{transition:none}#intro .hint{animation:none}}
 @media(min-width:620px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(min-width:1100px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -272,13 +272,15 @@ html.intro-on body{overflow:hidden}
 <section id="collection">
   <div class="shop-head">
     <h2 data-reveal="mask"><span class="line"><span>The collection</span></span></h2>
-    <p data-reveal="fade" data-delay=".3">Four pieces. Tap any one for the full details.</p>
+    <p data-reveal="fade" data-delay=".3">Six pieces. Tap any one for the full details.</p>
   </div>
   <div class="grid">
     <article class="card" data-id="jorts" data-reveal="wipe"><div class="art hb" data-open="jorts" tabindex="0"><img class="f" data-from="imf" alt="Vinto Jorts, front"><img class="b" data-from="imb" alt="Vinto Jorts, back"><i>Pre-order</i></div><div class="meta" data-open="jorts"><div><h3>Vinto Jorts</h3><p>Wide-leg jorts</p></div><strong>A$80</strong></div><button class="buy" data-add="jorts" type="button">Add to cart</button></article>
     <article class="card" data-id="static" data-reveal="wipe"><div class="art hb" data-open="static" tabindex="0"><img class="f " src="/assets/products/static-hood-front.webp" loading="lazy" decoding="async" alt="Static Hood, front" width="723" height="760"><img class="b " src="/assets/products/static-hood-back.webp" loading="lazy" decoding="async" alt="Static Hood, back" width="683" height="609"><i>Pre-order</i></div><div class="meta" data-open="static"><div><h3>Static Hood</h3><p>Oversized hoodie</p></div><strong>A$80</strong></div><div class="sw" data-sw="static"></div><button class="buy" data-add="static" type="button">Add to cart</button></article>
     <article class="card" data-id="sweats" data-reveal="wipe" data-delay=".24"><div class="art hb" data-open="sweats" tabindex="0"><img class="f " src="/assets/products/loop-sweats-front.webp" loading="lazy" decoding="async" alt="Loop Sweats, front" width="451" height="760"><img class="b " src="/assets/products/loop-sweats-back.webp" loading="lazy" decoding="async" alt="Loop Sweats, back" width="326" height="540"><i>Pre-order</i></div><div class="meta" data-open="sweats"><div><h3>Loop Sweats</h3><p>Wide-leg sweatpants</p></div><strong>A$90</strong></div><button class="buy" data-add="sweats" type="button">Add to cart</button></article>
     <article class="card" data-id="long" data-reveal="wipe" data-delay=".12"><div class="art hb" data-open="long" tabindex="0"><img class="f " src="/assets/products/long-black-front.webp" loading="lazy" decoding="async" alt="Long Shorts, front" width="740" height="739"><img class="b " src="/assets/products/long-black-back.webp" loading="lazy" decoding="async" alt="Long Shorts, back" width="718" height="755"><i>Pre-order</i></div><div class="meta" data-open="long"><div><h3>Long Shorts</h3><p>Long shorts, two colourways</p></div><strong>A$80</strong></div><div class="sw" data-sw="long"></div><button class="buy" data-add="long" type="button">Add to cart</button></article>
+    <article class="card" data-id="panel" data-reveal="wipe" data-delay=".2"><div class="art hb" data-open="panel" tabindex="0"><img class="f " src="/assets/products/panel-black-front.webp" loading="lazy" decoding="async" alt="Vinto Panel Pants, front" width="529" height="800"><img class="b " src="/assets/products/panel-black-back.webp" loading="lazy" decoding="async" alt="Vinto Panel Pants, back" width="528" height="800"><i>Pre-order</i></div><div class="meta" data-open="panel"><div><h3>Vinto Panel Pants</h3><p>Wide-leg pants, two colourways</p></div><strong>A$75</strong></div><div class="sw" data-sw="panel"></div><button class="buy" data-add="panel" type="button">Add to cart</button></article>
+    <article class="card" data-id="tee" data-reveal="wipe" data-delay=".28"><div class="art hb" data-open="tee" tabindex="0"><img class="f " src="/assets/products/tee-black-front.webp" loading="lazy" decoding="async" alt="Vinto Baggy Tee, front" width="654" height="578"><img class="b " src="/assets/products/tee-black-back.webp" loading="lazy" decoding="async" alt="Vinto Baggy Tee, back" width="660" height="580"><i>Pre-order</i></div><div class="meta" data-open="tee"><div><h3>Vinto Baggy Tee</h3><p>Baggy tee, two colourways</p></div><strong>A$55</strong></div><div class="sw" data-sw="tee"></div><button class="buy" data-add="tee" type="button">Add to cart</button></article>
     </div>
 </section>
 
@@ -345,12 +347,19 @@ em.addEventListener('keydown',e=>{if(e.key==='Enter')join()});
 const LINKS={
 jorts:'https://buy.stripe.com/eVqcMXbsq0WJ8eJ2pp9bO07',
 static:'https://buy.stripe.com/fZu00bbsq5cZeD72pp9bO05',
-sweats:'https://buy.stripe.com/dRm28j3ZYeNz1Ql5BB9bO03'
+sweats:'https://buy.stripe.com/dRm28j3ZYeNz1Ql5BB9bO03',
+tee:'https://buy.stripe.com/bJe14feECdJv3Yt4xx9bO0a',
+panel:'https://buy.stripe.com/4gM14f1RQaxj52x8NN9bO0b',
+long:'https://buy.stripe.com/4gMeV5dAy20NfHb5BB9bO0c'
 };
 const P={
 jorts:{n:'Vinto Jorts',p:80,d:'Wide-leg jorts cut baggy to the knee, in washed black fleece with faded charcoal panels. White piping traces the curved seams, with white blackletter “Vinto” embroidered on the thigh and a white script mark on the opposite leg.',f:['100% cotton, 500gsm','Wide, baggy knee-length cut','Elastic waistband with drawstring and metal tips','Side pockets','White piping on the seams','White embroidered logo and script mark, logo on the back waistband']},
 static:{n:'Static Hood',p:80,d:'An oversized panelled hoodie with raglan sleeves and white piping along the seams. Blackletter “Vinto” is embroidered across the chest, with the script mark low on the pocket side. Choose Grey / Olive or Black.',f:['Two colourways: Grey / Olive or Black','Oversized fit with balloon sleeves','Kangaroo pocket','Ribbed cuffs and hem','White piping on the panel seams','Embroidered chest logo, script mark at the hem'],colors:[{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/static-hood-front.webp','/assets/products/static-hood-back.webp']},{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/static-hood-black-front.webp']}]},
 long:{n:'Long Shorts',p:80,d:'Long, wide-cut shorts with curved seam panelling through the leg. White blackletter “Vinto” is embroidered on the thigh with the script mark on the opposite leg, and the logo and script mark repeat on the back. Choose Black or Grey / Olive.',f:['Two colourways: Black or Grey / Olive','Long, wide knee-length cut','Elastic waistband with drawstring and metal tips','Side pockets','Curved seam panelling','White embroidered logo and script mark on the front','Embroidered logo and script mark on the back'],colors:[{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/long-black-front.webp','/assets/products/long-black-back.webp']},{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/long-grey-front.webp','/assets/products/long-grey-back.webp']}]},
+panel:{n:'Vinto Panel Pants',p:75,d:'Wide-leg pants built from curved seam panels that run the length of each leg, finished with piping along every seam. White blackletter “Vinto” is embroidered on the thigh with the script mark on the opposite leg. Choose Black or Grey / Olive.',f:['Two colourways: Black or Grey / Olive','Wide, straight leg','Elastic waistband with drawstring and metal tips','Side pockets','Curved seam panelling with piping','Embroidered logo and script mark on the front','Panelled back']
+,colors:[{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/panel-black-front.webp','/assets/products/panel-black-back.webp']},{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/panel-grey-front.webp','/assets/products/panel-grey-back.webp']}]},
+tee:{n:'Vinto Baggy Tee',p:55,d:'A baggy, boxy tee with textured side panels and blackletter “Vinto” embroidered on the chest. A smaller “Vinto” sits at the upper back, and a woven VINTO label finishes the neck. Choose Black or Grey / Olive.',f:['Two colourways: Black or Grey / Olive','Baggy, boxy fit with dropped shoulders','Ribbed crew neck with woven VINTO label','Textured side panels','Embroidered “Vinto” on the chest','Embroidered “Vinto” at the upper back']
+,colors:[{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/tee-black-front.webp','/assets/products/tee-black-back.webp']},{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/tee-grey-front.webp','/assets/products/tee-grey-back.webp']}]},
 sweats:{n:'Loop Sweats',p:90,d:'Wide-leg sweatpants in washed grey, cut baggy through the leg and gathered at the hem. Curved seam panels run down each leg, with blackletter “Vinto” on the thigh and the script mark below.',f:['Wide, baggy leg with gathered hem','Elastic waistband','Curved seam panelling','Embroidered logo on the thigh','Logo and script mark on the back']},
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],money=n=>'A$'+n;
