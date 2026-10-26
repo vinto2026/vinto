@@ -232,6 +232,7 @@ html.intro-on body{overflow:hidden}
 @media(prefers-reduced-motion:reduce){#intro button{transition:none}#intro .hint{animation:none}}
 @media(min-width:620px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(min-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card.wide .art img{padding:2%}
 </style>
 </head>
 <body>
@@ -272,9 +273,10 @@ html.intro-on body{overflow:hidden}
 <section id="collection">
   <div class="shop-head">
     <h2 data-reveal="mask"><span class="line"><span>The collection</span></span></h2>
-    <p data-reveal="fade" data-delay=".3">Six pieces. Tap any one for the full details.</p>
+    <p data-reveal="fade" data-delay=".3">Seven pieces. Tap any one for the full details.</p>
   </div>
   <div class="grid">
+    <article class="card wide" data-id="tracksuit" data-reveal="wipe"><div class="art" data-open="tracksuit" tabindex="0"><img class="f" src="/assets/products/tracksuit-black.webp" loading="lazy" decoding="async" alt="Pipeline Track: black Static Hood and Vinto Jorts" width="1479" height="780"><i>Pre-order</i></div><div class="meta" data-open="tracksuit"><div><h3>Pipeline Track</h3><p>Static Hood + Vinto Jorts, sold as a set</p></div><strong>A$140</strong></div><button class="buy" data-add="tracksuit" type="button">Add to cart</button></article>
     <article class="card" data-id="jorts" data-reveal="wipe"><div class="art hb" data-open="jorts" tabindex="0"><img class="f" data-from="imf" alt="Vinto Jorts, front"><img class="b" data-from="imb" alt="Vinto Jorts, back"><i>Pre-order</i></div><div class="meta" data-open="jorts"><div><h3>Vinto Jorts</h3><p>Wide-leg jorts</p></div><strong>A$80</strong></div><button class="buy" data-add="jorts" type="button">Add to cart</button></article>
     <article class="card" data-id="static" data-reveal="wipe"><div class="art hb" data-open="static" tabindex="0"><img class="f " src="/assets/products/static-hood-front.webp" loading="lazy" decoding="async" alt="Static Hood, front" width="723" height="760"><img class="b " src="/assets/products/static-hood-back.webp" loading="lazy" decoding="async" alt="Static Hood, back" width="683" height="609"><i>Pre-order</i></div><div class="meta" data-open="static"><div><h3>Static Hood</h3><p>Oversized hoodie</p></div><strong>A$80</strong></div><div class="sw" data-sw="static"></div><button class="buy" data-add="static" type="button">Add to cart</button></article>
     <article class="card" data-id="sweats" data-reveal="wipe" data-delay=".24"><div class="art hb" data-open="sweats" tabindex="0"><img class="f " src="/assets/products/loop-sweats-front.webp" loading="lazy" decoding="async" alt="Loop Sweats, front" width="451" height="760"><img class="b " src="/assets/products/loop-sweats-back.webp" loading="lazy" decoding="async" alt="Loop Sweats, back" width="326" height="540"><i>Pre-order</i></div><div class="meta" data-open="sweats"><div><h3>Loop Sweats</h3><p>Wide-leg sweatpants</p></div><strong>A$90</strong></div><button class="buy" data-add="sweats" type="button">Add to cart</button></article>
@@ -350,7 +352,8 @@ static:'https://buy.stripe.com/fZu00bbsq5cZeD72pp9bO05',
 sweats:'https://buy.stripe.com/dRm28j3ZYeNz1Ql5BB9bO03',
 tee:'https://buy.stripe.com/bJe14feECdJv3Yt4xx9bO0a',
 panel:'https://buy.stripe.com/4gM14f1RQaxj52x8NN9bO0b',
-long:'https://buy.stripe.com/4gMeV5dAy20NfHb5BB9bO0c'
+long:'https://buy.stripe.com/4gMeV5dAy20NfHb5BB9bO0c',
+tracksuit:'https://buy.stripe.com/eVq28j7ca20N9iN3tt9bO0d'
 };
 const P={
 jorts:{n:'Vinto Jorts',p:80,d:'Wide-leg jorts cut baggy to the knee, in washed black fleece with faded charcoal panels. White piping traces the curved seams, with white blackletter “Vinto” embroidered on the thigh and a white script mark on the opposite leg.',f:['100% cotton, 500gsm','Wide, baggy knee-length cut','Elastic waistband with drawstring and metal tips','Side pockets','White piping on the seams','White embroidered logo and script mark, logo on the back waistband']},
@@ -360,6 +363,7 @@ panel:{n:'Vinto Panel Pants',p:75,d:'Wide-leg pants built from curved seam panel
 ,colors:[{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/panel-black-front.webp','/assets/products/panel-black-back.webp']},{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/panel-grey-front.webp','/assets/products/panel-grey-back.webp']}]},
 tee:{n:'Vinto Baggy Tee',p:55,d:'A baggy, boxy tee with textured side panels and blackletter “Vinto” embroidered on the chest. A smaller “Vinto” sits at the upper back, and a woven VINTO label finishes the neck. Choose Black or Grey / Olive.',f:['Two colourways: Black or Grey / Olive','Baggy, boxy fit with dropped shoulders','Ribbed crew neck with woven VINTO label','Textured side panels','Embroidered “Vinto” on the chest','Embroidered “Vinto” at the upper back']
 ,colors:[{k:'black',n:'Black',sw:'#0b0b0b',v:['/assets/products/tee-black-front.webp','/assets/products/tee-black-back.webp']},{k:'grey',n:'Grey / Olive',sw:'linear-gradient(135deg,#8d8d8d 50%,#4b513c 50%)',v:['/assets/products/tee-grey-front.webp','/assets/products/tee-grey-back.webp']}]},
+tracksuit:{n:'Pipeline Track',p:140,d:'The black Static Hood and the Vinto Jorts, sold together as one matching set. An oversized panelled hoodie with raglan sleeves and a kangaroo pocket, paired with wide, knee-length jorts. Both pieces are washed black with white piping and white embroidered “Vinto” and script mark. Your size applies to both pieces.',f:['Set: black Static Hood + Vinto Jorts','Matching washed black with white piping','Oversized hoodie with balloon sleeves and kangaroo pocket','Wide, baggy knee-length jorts with drawstring','White embroidered logo and script mark on both pieces','One size choice covers both pieces']},
 sweats:{n:'Loop Sweats',p:90,d:'Wide-leg sweatpants in washed grey, cut baggy through the leg and gathered at the hem. Curved seam panels run down each leg, with blackletter “Vinto” on the thigh and the script mark below.',f:['Wide, baggy leg with gathered hem','Elastic waistband','Curved seam panelling','Embroidered logo on the thigh','Logo and script mark on the back']},
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],money=n=>'A$'+n;
@@ -406,7 +410,7 @@ const openM=id=>{
  cur=id;const p=P[id];
  $('#mt').textContent=p.n;$('#mp').textContent=money(p.p);$('#md').textContent=p.d;
  $('#ml').innerHTML=p.f.map(x=>'<li>'+x+'</li>').join('');
- $('#mbuy').href=LINKS[id]||'#';$('#mbuy').classList.toggle('off',!LINKS[id]);$('#mbuy').textContent=LINKS[id]?'Pre-order now':'Link coming soon';$('#mbuy').style.display=hasC(id)?'none':'';$('#herobuy').href=LINKS.jorts;$('#madd').dataset.add=id;
+ $('#mbuy').href=LINKS[id]||'#';$('#mbuy').classList.toggle('off',!LINKS[id]);$('#mbuy').textContent=LINKS[id]?'Pre-order now':'Link coming soon';$('#mbuy').style.display=(hasC(id)||!LINKS[id])?'none':'';$('#herobuy').href=LINKS.jorts;$('#madd').dataset.add=id;
  drawViews();
  $('#modal').classList.add('open');lock();render();$('.mbox').scrollTop=0;
 };

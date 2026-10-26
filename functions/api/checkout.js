@@ -6,6 +6,7 @@ const PRODUCTS = {
   long:   { name: 'Long Shorts',  aud: 80, colors: { black: 'Black', grey: 'Grey / Olive' } },
   panel:  { name: 'Vinto Panel Pants', aud: 75, colors: { black: 'Black', grey: 'Grey / Olive' } },
   tee:    { name: 'Vinto Baggy Tee',    aud: 55, colors: { black: 'Black', grey: 'Grey / Olive' } },
+  tracksuit: { name: 'Pipeline Track, Static Hood + Vinto Jorts', aud: 140 },
   sweats: { name: 'Loop Sweats',  aud: 90 },
 };
 const SIZES = ['S', 'M', 'L', 'XL'];
