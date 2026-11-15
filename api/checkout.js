@@ -1,13 +1,13 @@
 // Vercel Serverless Function: POST /api/checkout  (same logic as functions/api/checkout.js)
 // Needs env var STRIPE_SECRET_KEY (live key, sk_live_...).
 const PRODUCTS = {
-  jorts:  { name: 'Vinto Jorts',  aud: 80 },
-  static: { name: 'Static Hood',  aud: 80, colors: { grey: 'Grey / Olive', black: 'Black' } },
+  zip:    { name: 'Distressed Zip Up', aud: 65 },
+  fadeaway: { name: 'Fadeaway Tracksuit, Hoodie + Pants', aud: 120 },
+  jorts:  { name: 'Vinto Jorts',  aud: 60 },
+  static: { name: 'Static Hood',  aud: 60, colors: { grey: 'Grey / Olive', black: 'Black' } },
   long:   { name: 'Long Shorts',  aud: 80, colors: { black: 'Black', grey: 'Grey / Olive' } },
   panel:  { name: 'Vinto Panel Pants', aud: 75, colors: { black: 'Black', grey: 'Grey / Olive' } },
-  tee:    { name: 'Vinto Baggy Tee',    aud: 55, colors: { black: 'Black', grey: 'Grey / Olive' } },
-  tracksuit: { name: 'Pipeline Track, Static Hood + Vinto Jorts', aud: 140 },
-  sweats: { name: 'Loop Sweats',  aud: 90 },
+  tracksuit: { name: 'Pipeline Track, Static Hood + Vinto Jorts', aud: 120 },
 };
 const SIZES = ['S', 'M', 'L', 'XL'];
 
@@ -27,6 +27,10 @@ module.exports = async (req, res) => {
   p.set('shipping_address_collection[allowed_countries][1]', 'NZ');
   p.set('billing_address_collection', 'auto');
   p.set('custom_text[submit][message]', 'Pre-order: estimated to ship early December 2026. We will email you when your order ships.');
+  // signed-in customers: prefill their email and tag the order with their account id
+  const acct = req.body || {};
+  if (typeof acct.email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(acct.email) && acct.email.length <= 200) p.set('customer_email', acct.email);
+  if (typeof acct.uid === 'string' && /^[0-9a-f-]{36}$/i.test(acct.uid)) p.set('client_reference_id', acct.uid);
 
   let n = 0;
   for (const it of items) {
