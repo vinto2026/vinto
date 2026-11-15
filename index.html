@@ -265,6 +265,11 @@ footer{padding:clamp(40px,5vw,70px) var(--pad) calc(env(safe-area-inset-bottom,0
 .pop .pbox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100% - 20px));max-height:calc(100% - 20px);overflow:auto;background:var(--panel);border:1px solid var(--line);padding:clamp(26px,6vw,40px);animation:pop .4s var(--ease)}
 .pop .ttl{font-size:clamp(1.9rem,7vw,2.6rem);padding-right:34px}
 .plead{color:#b4b4b4;margin:14px 0 22px}
+.plead.small{font-size:.86rem;margin:-6px 0 18px}
+.plead.small:empty{display:none}
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px dashed rgba(255,255,255,.45);padding:12px 12px 12px 18px;margin:0 0 20px}
+.codebox span{font-weight:800;font-size:1.7rem;letter-spacing:.06em;user-select:all}
+.pop .codebox .btn{width:auto;flex:none}
 .field{display:block;margin-bottom:14px}
 .field>span{display:block;margin-bottom:6px;color:var(--mute);text-transform:uppercase;letter-spacing:.07em;font-size:.68rem;font-weight:500}
 .field input,.field select,.field textarea,.phone input,.phone select{width:100%;font:inherit;font-size:1rem;color:var(--white);background:#000;border:1px solid var(--line);padding:13px 14px;border-radius:0;transition:border-color .2s}
@@ -459,7 +464,7 @@ html.intro-on body{overflow:hidden}
 
 <footer>
   <img class="fmark" src="assets/vinto-logo.webp" alt="Vinto" width="1200" height="432" loading="lazy">
-  <div class="flinks"><a href="#collection">Shop all</a><button type="button" id="smsopen" hidden>10% off with SMS</button><a href="#join">Email list</a><a href="#contact">Contact</a></div>
+  <div class="flinks"><a href="#collection">Shop all</a><button type="button" id="smsopen" hidden>Get 10% off</button><a href="#join">Email list</a><a href="#contact">Contact</a></div>
   <div class="legal"><span>© 2026 VINTO. Designed in Adelaide, South Australia.</span><span>All pieces are pre-order</span><a class="ig" href="https://www.instagram.com/vintostreetwear?obrf=YTZqZWJ6ODhuOW15&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="VINTO on Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>Instagram</a></div>
 </footer>
 
@@ -474,15 +479,15 @@ html.intro-on body{overflow:hidden}
 <div class="modal pop" id="sms" role="dialog" aria-modal="true" aria-labelledby="smsh"><div class="mback" data-close></div><div class="pbox"><button class="x" data-close type="button" aria-label="Close">×</button>
   <form id="smsform" novalidate>
     <h3 class="ttl" id="smsh">10% off your<br>first order</h3>
-    <p class="plead">Sign up with SMS and we’ll text you the code.</p>
+    <p class="plead">Enter your mobile number to get your code.</p>
     <div class="phone"><span class="cc" id="smscc1">+61</span><select id="smscc" aria-label="Country code" hidden><option value="AU">+61</option><option value="NZ">+64</option></select><input id="smsnum" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="Mobile number" aria-label="Mobile number" maxlength="20"></div>
     <input class="hp" id="smshp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <label class="agree"><input type="checkbox" id="smsok"><span id="smsterms">I agree to receive marketing texts from VINTO at this number. Reply STOP to opt out.</span></label>
-    <button class="btn" id="smsgo" type="submit">Text me the code</button>
+    <button class="btn" id="smsgo" type="submit">Get my code</button>
     <p class="perr" id="smserr" role="alert"></p>
     <button class="plain" type="button" data-close>No thanks</button>
   </form>
-  <div id="smsdone" hidden><h3 class="ttl">Thanks for signing up.</h3><p class="plead" id="smsdonep">Your code is on its way by text. Enter it in the promo code box at checkout.</p><button class="btn" type="button" data-close>Keep shopping</button></div>
+  <div id="smsdone" hidden><h3 class="ttl">Thanks for signing up.</h3><p class="plead">Here’s your 10% off code. Enter it in the promo code box at checkout.</p><div class="codebox"><span id="smscode">VINTO10</span><button class="btn ghost sm" id="smscopy" type="button">Copy code</button></div><p class="plead small" id="smsdonep"></p><button class="btn" type="button" data-close>Keep shopping</button></div>
 </div></div>
 
 <div class="modal pop" id="acct" role="dialog" aria-modal="true" aria-labelledby="accth"><div class="mback" data-close></div><div class="pbox"><button class="x" data-close type="button" aria-label="Close">×</button>
@@ -704,14 +709,16 @@ const initSms=()=>{
  const st=smsState();if(st&&(st.s==='done'||Date.now()-st.t<7*864e5))return;        // signed up, or said no thanks this week
  const wait=setInterval(()=>{if(root.classList.contains('intro-on'))return;clearInterval(wait);setTimeout(()=>{if(!$('.modal.open,.cart.open'))openSms('popup')},1500)},300);
 };
+$('#smscopy').addEventListener('click',async()=>{const b=$('#smscopy'),c=$('#smscode').textContent;try{await navigator.clipboard.writeText(c);b.textContent='Copied'}catch(e){const r=document.createRange();r.selectNodeContents($('#smscode'));const g=getSelection();g.removeAllRanges();g.addRange(r);b.textContent='Select and copy'}});
 $('#smsform').addEventListener('submit',async e=>{
  e.preventDefault();const err=$('#smserr'),btn=$('#smsgo'),num=$('#smsnum').value.trim();err.textContent='';
  if(num.replace(/\D/g,'').length<8){err.textContent='Enter your mobile number.';return}
  if(!$('#smsok').checked){err.textContent='Tick the box to agree to texts from VINTO.';return}
  busy(btn,true,'Sending…');
  try{
-  const d=DEMO?{ok:true,demo:true}:await post('/api/sms-signup',{phone:num,country:$('#smscc').value,consent:true,consentText:$('#smsterms').textContent,source:smsSource,page:location.pathname,website:$('#smshp').value});
-  $('#smsdonep').textContent=d.demo?'Preview only: no text was sent. On the live site the code arrives by text.':d.already?'This number is already signed up. Check your texts for the code.':'Your code is on its way by text. Enter it in the promo code box at checkout.';
+  const d=DEMO?{ok:true,demo:true,code:'VINTO10'}:await post('/api/sms-signup',{phone:num,country:$('#smscc').value,consent:true,consentText:$('#smsterms').textContent,source:smsSource,page:location.pathname,website:$('#smshp').value});
+  $('#smscode').textContent=d.code||'VINTO10';$('#smscopy').textContent='Copy code';
+  $('#smsdonep').textContent=d.demo?'Preview only: this number was not saved.':d.texted?'We’ve also texted it to you.':d.already?'This number is already signed up.':'';
   $('#smsform').hidden=true;$('#smsdone').hidden=false;smsRemember('done');
  }catch(x){err.textContent=x.message}
  busy(btn,false);

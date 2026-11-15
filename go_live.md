@@ -1,14 +1,26 @@
 # VINTO site
 
-A static site (index.html + assets) with a few small server functions. No build step.
-Upload the whole folder to your host the same way as before.
+A static site (index.html + assets) with a few small server functions, hosted on Vercel from GitHub. No build step.
+
+## Uploading to GitHub (do this every time the site changes)
+
+The site is many files in folders. **Every file has to reach GitHub in its folder**, or pictures and 3D go missing.
+
+1. Unzip `vinto-website.zip` on a computer (not a phone). You get a folder called `vinto-website`.
+2. On github.com open your site's repository. Check where `index.html` sits now: usually at the top level, next to the `api` folder.
+3. Click **Add file > Upload files**.
+4. Open the `vinto-website` folder, select **everything inside it** (Cmd+A on Mac, Ctrl+A on Windows) and drag it all onto the GitHub page.
+   Drag the contents, not the `vinto-website` folder itself, and not the zip.
+5. Wait until GitHub has listed every file, then press **Commit changes**.
+6. Vercel publishes the new version by itself within a minute or two.
+7. Open `https://YOUR-DOMAIN/check.html`. Every line should say OK. A red line names a file that didn't arrive: upload it again into the same folder.
 
 ## What is where
 
 - `index.html`: the whole page. Products, prices and Stripe links are near the bottom, in `const LINKS` and `const P`.
 - `assets/js/vinto3d.js`: the 3D engine (product films, the spinning lineup, the product viewer).
 - `assets/products/`: product photos. Files with `-3d-` in the name are only used by the 3D engine.
-- `api/` (Vercel) and `functions/api/` (Cloudflare Pages): the server functions. Both folders do the same thing; your host uses the one it understands.
+- `api/`: the server functions Vercel runs.
   - `checkout`: one Stripe Checkout page for the whole cart
   - `order-email` (Vercel only): emails you each paid order
   - `config`: tells the page which features below are connected
@@ -16,11 +28,12 @@ Upload the whole folder to your host the same way as before.
   - `contact`: emails you a contact-form message
 - `setup/database.sql`: creates your private database tables (see step 1 below).
 - `success.html`: the thank-you page.
+- `check.html`: the upload check (see above).
 
 ## Prices live in three places. Keep them equal.
 
 1. `const P` in `index.html` (what the page shows)
-2. `PRODUCTS` in `api/checkout.js` and `functions/api/checkout.js` (what the cart charges)
+2. `PRODUCTS` in `api/checkout.js` (what the cart charges)
 3. Each Stripe Payment Link in `const LINKS` (what "Pre-order now" charges). These prices are set inside Stripe.
 
 Current prices (AUD): Distressed Zip Up 65, Fadeaway Tracksuit 120, Vinto Jorts 60, Static Hood 60,
@@ -39,7 +52,8 @@ Nothing in the code needs editing.
 | Contact form sends you email | Resend (you already use it for order emails) | `RESEND_API_KEY` + `ORDER_EMAIL_TO` (or `CONTACT_EMAIL_TO`) |
 | Sign in / sign up, saved details | Supabase (free tier) | `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY` |
 | Private database of signups | Supabase | `SUPABASE_URL` + `SUPABASE_SECRET_KEY` |
-| "10% off" SMS pop-up | Twilio (paid per text) + Supabase | the Supabase pair above + `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` |
+| "10% off" pop-up: saves the number, shows VINTO10 on screen | Supabase (free) | `SUPABASE_URL` + `SUPABASE_SECRET_KEY` |
+| Also texts the code (optional) | Twilio (paid per text) | add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` |
 
 Until the contact form is connected it still works: it opens the visitor's email app with the message filled in.
 
@@ -70,18 +84,22 @@ the page cannot read them, and neither can a signed-in customer. You view them b
 **Table Editor > sms_signups** (export to CSV from there), **Table Editor > contact_messages**, and
 **Authentication > Users** for everyone with an account. Orders stay in Stripe.
 
-## Step 2. SMS (Twilio)
+## Step 2. Texting the code (optional, Twilio)
 
-1. Make an account at twilio.com and get an **Australian mobile number that can send SMS**. Twilio may ask for your business details first.
-2. Copy your **Account SID**, **Auth Token** and the number (written like `+614...`).
-3. A number is the simple choice because replies work, so "Reply STOP" opts people out automatically.
-   A sender name like "VINTO" instead of a number has to be registered in Australia before use, and cannot receive replies.
+The pop-up works without this: it saves each number and shows VINTO10 on screen with a Copy button. Every number is kept in
+`sms_signups` (status `shown_on_site`), so you can text your list later.
 
-What the visitor gets, once, per phone number:
+To also text the code, set up Twilio (paid per text; the free trial only reaches numbers you verify yourself):
+1. Sign up at twilio.com, upgrade the account and add credit.
+2. Phone Numbers > Regulatory Compliance > Bundles: submit your name and Australian address (or business name, address and ABN). Approval takes up to 3 business days.
+3. Phone Numbers > Manage > Buy a number: Australia, SMS, a mobile number (+614...).
+4. Add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_FROM` in Vercel, then redeploy.
+
+Once those are in, each new signup also gets one text:
 
 > VINTO: Thanks for signing up. Use code VINTO10 for 10% off your first order at YOUR-DOMAIN. Reply STOP to opt out.
 
-Built-in limits so nobody can run up your SMS bill: one text per number, 5 signups per hour per connection, 300 per day in total.
+Limits: one text per number, 5 signups per hour per connection, 300 texts per day in total.
 
 ## Step 3. The discount code (Stripe)
 
@@ -90,16 +108,16 @@ and tick the option that limits it to a customer's first order. Customers type i
 
 ## Step 4. Add the variables and redeploy
 
-Vercel: Settings > Environment Variables. Cloudflare Pages: Settings > Variables and Secrets.
+Vercel: your project > **Settings > Environment Variables**. Add each one for Production, then go to **Deployments**, open the latest one and choose **Redeploy** so the site picks them up.
 
 | Variable | Value |
 |---|---|
 | `SUPABASE_URL` | `https://jtpmfvfhrrmslrblqbze.supabase.co` |
 | `SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_UwbSv-F454kR-_-6ZhtM7A_6XLdgG3q` (safe to be public) |
 | `SUPABASE_SECRET_KEY` | the secret key from Step 1 (keep private) |
-| `TWILIO_ACCOUNT_SID` | starts with `AC` |
-| `TWILIO_AUTH_TOKEN` | from the Twilio console (keep private) |
-| `TWILIO_FROM` | your Twilio number, like `+61480000000` (or a Messaging Service SID starting `MG`) |
+| `TWILIO_ACCOUNT_SID` | optional, only for texting: starts with `AC` |
+| `TWILIO_AUTH_TOKEN` | optional, only for texting (keep private) |
+| `TWILIO_FROM` | optional, only for texting: your Twilio number, like `+61480000000` (or a Messaging Service SID starting `MG`) |
 | `CONTACT_EMAIL_TO` | optional: where contact messages go. Defaults to `ORDER_EMAIL_TO` |
 | `SMS_CODE` | optional: the code that is texted. Defaults to `VINTO10` |
 | `SMS_COUNTRIES` | optional: `AU` by default. Set to `AU,NZ` to accept New Zealand mobiles too, once you have confirmed your Twilio sender can reach NZ |
@@ -107,8 +125,8 @@ Vercel: Settings > Environment Variables. Cloudflare Pages: Settings > Variables
 
 Already set from before: `STRIPE_SECRET_KEY`, and for order emails `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `ORDER_EMAIL_TO`.
 
-After redeploying, open `https://YOUR-DOMAIN/api/config`. You should see `"sms":true`, `"contact":true` and an `"accounts"` entry.
-Then sign up with your own phone once to check the text arrives.
+After redeploying, open `https://YOUR-DOMAIN/check.html`. The pop-up, sign-in and contact rows should say ON.
+Then sign up in the pop-up with your own number and check it appears in Supabase under Table Editor > sms_signups.
 
 ## Marketing texts: the rules
 
@@ -123,7 +141,7 @@ the text names VINTO, and it ends with "Reply STOP to opt out". Only text people
 1. Stripe Dashboard, Test mode OFF: one Payment Link per product, in AUD, at the prices above.
 2. In each link's "After payment" settings, redirect to `https://YOUR-DOMAIN/success.html`
 3. In `index.html` find `const LINKS={` and check each URL is the live link for that product.
-4. `STRIPE_SECRET_KEY` (sk_live_...) is set on your host.
+4. `STRIPE_SECRET_KEY` (sk_live_...) is set in Vercel.
 5. Upload this folder and place one small real order to confirm.
 
 ## Adding a product to the 3D views

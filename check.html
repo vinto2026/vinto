@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>VINTO – upload check</title>
+<style>
+body{margin:0;background:#000;color:#fff;font:15px/1.5 'Helvetica Neue',Arial,sans-serif;padding:28px 18px 60px}
+main{max-width:720px;margin:0 auto}
+h1{font-size:1.6rem;text-transform:uppercase;letter-spacing:-.01em;margin:0 0 6px}
+p{color:#aaa;margin:0 0 18px}
+#sum{font-size:1.1rem;font-weight:700;padding:14px 16px;border:1px solid #333;margin:0 0 22px}
+#sum.ok{border-color:#2e7d32;color:#7ee787}#sum.bad{border-color:#b71c1c;color:#ff9d9d}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:#888;margin:26px 0 8px;font-weight:600}
+ul{list-style:none;padding:0;margin:0}
+li{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-top:1px solid #1f1f1f;font-family:Menlo,Consolas,monospace;font-size:.82rem;word-break:break-all}
+li b{flex:none;font-family:Arial,sans-serif;font-size:.8rem}
+.y{color:#7ee787}.n{color:#ff9d9d}.w{color:#e3b341}
+</style>
+</head>
+<body><main>
+<h1>Upload check</h1>
+<p>Open this page on your live site after each upload. Every line should say OK. A red line names a file that did not reach GitHub: upload that file again into the same folder.</p>
+<div id="sum">Checking…</div>
+<h2>Website files</h2><ul id="files"></ul>
+<h2>3D</h2><ul id="gl"></ul>
+<h2>Server features (only work on Vercel, not when opening the file directly)</h2><ul id="srv"></ul>
+</main>
+<script>
+const FILES=["index.html", "success.html", "assets/apple-touch-icon.png", "assets/favicon.png", "assets/fonts/archivo.woff2", "assets/js/supabase.js", "assets/js/three.module.min.js", "assets/js/vinto3d.js", "assets/lookbook/look-1.webp", "assets/lookbook/look-2.webp", "assets/lookbook/look-3.webp", "assets/lookbook/look-4.webp", "assets/products/distressed-zip-3d-back.webp", "assets/products/distressed-zip-3d-panels.webp", "assets/products/distressed-zip-front.webp", "assets/products/fadeaway-back.webp", "assets/products/fadeaway-front.webp", "assets/products/jorts-back.webp", "assets/products/jorts-front.webp", "assets/products/long-black-back.webp", "assets/products/long-black-front.webp", "assets/products/long-grey-back.webp", "assets/products/long-grey-front.webp", "assets/products/panel-black-back.webp", "assets/products/panel-black-front.webp", "assets/products/panel-grey-back.webp", "assets/products/panel-grey-front.webp", "assets/products/static-hood-back.webp", "assets/products/static-hood-black-front.webp", "assets/products/static-hood-front.webp", "assets/products/tracksuit-black.webp", "assets/products/zip-pull.webp", "assets/vinto-logo.webp"], NEW=["assets/apple-touch-icon.png", "assets/favicon.png", "assets/fonts/archivo.woff2", "assets/js/supabase.js", "assets/js/three.module.min.js", "assets/js/vinto3d.js", "assets/products/distressed-zip-3d-back.webp", "assets/products/distressed-zip-3d-panels.webp", "assets/products/distressed-zip-front.webp", "assets/products/fadeaway-back.webp", "assets/products/fadeaway-front.webp", "assets/products/zip-pull.webp"];
+const row=(ul,name,state,note)=>{const li=document.createElement('li');li.innerHTML='<span></span><b></b>';li.firstChild.textContent=name;li.lastChild.textContent=note;li.lastChild.className=state;document.getElementById(ul).appendChild(li)};
+(async()=>{
+ let bad=0;
+ for(const f of FILES){
+  let ok=false;try{const r=await fetch(f,{cache:'no-store'});ok=r.ok&&(await r.blob()).size>0}catch(e){}
+  if(!ok)bad++;
+  row('files',f,ok?'y':'n',ok?'OK':(NEW.includes(f)?'MISSING (new file)':'MISSING'));
+ }
+ let gl=false;try{gl=!!document.createElement('canvas').getContext('webgl2')}catch(e){}
+ row('gl','This browser can show 3D',gl?'y':'w',gl?'OK':'No, this device or browser blocks 3D, so the site shows photos instead');
+ try{const m=await import('./assets/js/vinto3d.js');row('gl','3D engine loads',m&&m.initFilm?'y':'n',m&&m.initFilm?'OK':'BROKEN');if(!(m&&m.initFilm))bad++}
+ catch(e){bad++;row('gl','3D engine loads','n','FAILED: '+String(e.message||e).slice(0,80))}
+ try{const r=await fetch('/api/config',{cache:'no-store'});const c=r.ok?await r.json():null;
+  if(!c){row('srv','/api/config','w','Not reachable (normal if not on Vercel yet)')}
+  else{row('srv','Contact form emails you',c.contact?'y':'w',c.contact?'ON':'OFF: add RESEND_API_KEY and ORDER_EMAIL_TO');
+   row('srv','Sign in / sign up',c.accounts?'y':'w',c.accounts?'ON':'OFF: add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY');
+   row('srv','10% pop-up (saves numbers, shows VINTO10)',c.sms?'y':'w',c.sms?'ON':'OFF: add SUPABASE_URL and SUPABASE_SECRET_KEY');
+   row('srv','Also texts the code (optional, paid)',c.smsText?'y':'w',c.smsText?'ON':'OFF: only needed if you add Twilio later')}
+ }catch(e){row('srv','/api/config','w','Not reachable')}
+ const s=document.getElementById('sum');
+ s.className=bad?'bad':'ok';s.textContent=bad?bad+' file'+(bad>1?'s are':' is')+' missing. Upload the red ones again, keeping their folders.':'All website files are in place.';
+})();
+</script>
+</body>
+</html>
